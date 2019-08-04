@@ -77,9 +77,7 @@ namespace WebRTC
 
         public void Connected(int id)
         {
-            var data = new RoomJson();
-            data.type = "connect";
-            data.roomId = roomId;
+            var data = new RoomJson { type = "connect", roomId = roomId };            
             var json = JsonUtility.ToJson(data);
             OnConnectMethod(json);
         }

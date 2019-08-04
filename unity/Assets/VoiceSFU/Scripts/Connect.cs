@@ -16,6 +16,12 @@ public class Connect : MonoBehaviour
 
     public IOnRemoteVideo OnRemoteVideo;
 
+    public delegate void IOnConnectd();
+    public IOnConnectd OnConnectd;
+
+    public delegate void IOnData(string msg);
+    public IOnData OnData;
+
     bool connected = false;
 
     string baseAddress = "";
@@ -37,7 +43,7 @@ public class Connect : MonoBehaviour
 
         signaling = new Signaling(ipAddress);
         signaling.OnConnectMethod += OnConnet;
-        signaling.OnDataMethod += OnData;
+        signaling.OnDataMethod += OnDataMethod;
         signaling.OnSdpMethod += OnSdp;
         signaling.OnRemoteVideo += OnI420RemoteFrameReady;
 
@@ -84,17 +90,18 @@ public class Connect : MonoBehaviour
     {
         if (connected == true) return;
         Debug.Log("connect");
-        signaling.peer.SendDataViaDataChannel("test from unity");
         connected = true;
         signaling.peer.AddDataChannel();
 
         Scheduler.MainThread.Schedule(() =>
                 {
                     Observable.Interval(TimeSpan.FromMilliseconds(1000)).Subscribe(_ =>
-       {           
+       {
            signaling.peer.SendDataViaDataChannel("test from unity");
        }).AddTo(this);
                 });
+
+        OnConnectd();
 
     }
 
@@ -104,9 +111,10 @@ public class Connect : MonoBehaviour
             signaling.peer.SendDataViaDataChannel(str);
     }
 
-    void OnData(string s)
+    void OnDataMethod(string s)
     {
         Debug.Log("data " + s);
+        OnData(s);
     }
 
     public class AnswerReq

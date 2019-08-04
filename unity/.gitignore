@@ -39,12 +39,6 @@ Assets/QuestRdp/Models*
 
 # Depend
 Assets/Oculus*
-#Assets/QuestView*
-Assets/MeshBaker*
-Assets/SimplestMeshBaker*
-Assets/TextMesh Pro*
-Assets/AllSkyFree*
-Assets/VrGrabber*
 Assets/UniRX*
 Assets/Utf8Json*
 Assets/UnityOpus*
