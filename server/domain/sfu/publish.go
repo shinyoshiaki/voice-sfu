@@ -1,8 +1,8 @@
 package sfu
 
 import (
-	"voice-sfu/server/domain/store"
 	"fmt"
+	"voice-sfu/server/domain/store"
 
 	"github.com/pion/webrtc/v2"
 )
@@ -13,6 +13,11 @@ func Publish(dc *webrtc.DataChannel, room string, uu string) {
 		groupe := store.GetDatachannels(room)
 		for k, v := range groupe {
 			if k != uu {
+				defer func() {
+					if err := recover(); err != nil {
+						fmt.Println("recover:", err)
+					}
+				}()
 				if msg.IsString == true {
 					v.SendText(string(msg.Data))
 				} else {

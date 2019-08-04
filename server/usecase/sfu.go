@@ -1,10 +1,10 @@
 package usecase
 
 import (
+	"fmt"
 	"voice-sfu/server/domain/sfu"
 	"voice-sfu/server/domain/store"
 	"voice-sfu/server/domain/webrtc/peer"
-	"fmt"
 
 	"github.com/pion/webrtc/v2"
 )
@@ -29,7 +29,6 @@ func Join(room string) (webrtc.SessionDescription, string, error) {
 		}
 		if connectionState.String() == "connected" {
 			fmt.Println("connectedd")
-			dc.SendText("ping")
 		}
 	})
 
