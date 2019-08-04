@@ -1,9 +1,9 @@
 package usecase
 
 import (
-	"voice-sfu/src/domain/sfu"
-	"voice-sfu/src/domain/store"
-	"voice-sfu/src/domain/webrtc/peer"
+	"voice-sfu/server/domain/sfu"
+	"voice-sfu/server/domain/store"
+	"voice-sfu/server/domain/webrtc/peer"
 	"fmt"
 
 	"github.com/pion/webrtc/v2"

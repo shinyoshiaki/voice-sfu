@@ -1,7 +1,7 @@
 package sfu
 
 import (
-	"voice-sfu/src/domain/store"
+	"voice-sfu/server/domain/store"
 	"fmt"
 
 	"github.com/pion/webrtc/v2"

@@ -1,7 +1,7 @@
 package gateway
 
 import (
-	"voice-sfu/src/usecase"
+	"voice-sfu/server/usecase"
 	"fmt"
 	"net/http"
 

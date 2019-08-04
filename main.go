@@ -1,7 +1,7 @@
 package main
 
 import (
-	"voice-sfu/src/gateway"
+	"voice-sfu/server/gateway"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
