@@ -84,7 +84,6 @@ namespace WebRTC
 
         public void Received(int id, string s)
         {
-            Debug.Log(s);
             OnDataMethod(s);
         }
 

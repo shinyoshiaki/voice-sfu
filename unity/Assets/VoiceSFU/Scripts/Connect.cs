@@ -89,20 +89,10 @@ public class Connect : MonoBehaviour
     void OnConnet(string str)
     {
         if (connected == true) return;
-        Debug.Log("connect");
+        
         connected = true;
         signaling.peer.AddDataChannel();
-
-        Scheduler.MainThread.Schedule(() =>
-                {
-                    Observable.Interval(TimeSpan.FromMilliseconds(1000)).Subscribe(_ =>
-       {
-           signaling.peer.SendDataViaDataChannel("test from unity");
-       }).AddTo(this);
-                });
-
         OnConnectd();
-
     }
 
     public void Send(string str)
@@ -113,7 +103,6 @@ public class Connect : MonoBehaviour
 
     void OnDataMethod(string s)
     {
-        Debug.Log("data " + s);
         OnData(s);
     }
 

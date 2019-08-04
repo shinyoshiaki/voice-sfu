@@ -1,17 +1,20 @@
 ﻿using System;
 using UnityEngine;
 using UniRx;
+using System.IO;
+using System.IO.Compression;
 
 public class StartConnect : MonoBehaviour
 {
     MicRecorder micRecorder;
     Speaker speaker;
+    Connect connect;
 
     void Start()
     {
         var s = Scheduler.MainThread;
 
-        var connect = GetComponent<Connect>();
+        connect = GetComponent<Connect>();
         micRecorder = GetComponent<MicRecorder>();
         speaker = GetComponent<Speaker>();
 
@@ -34,15 +37,35 @@ public class StartConnect : MonoBehaviour
 
     void OnEncode(byte[] data, int length)
     {
-        Debug.Log(length + ":" + data.Length);
-        var encode = Convert.ToBase64String(data);
+        MemoryStream ms = new MemoryStream();
+        DeflateStream CompressedStream = new DeflateStream(ms, CompressionMode.Compress, true);
+        CompressedStream.Write(data, 0, data.Length);
+        CompressedStream.Close();
+        var encode = Convert.ToBase64String(ms.ToArray());
+        ms.Close();
         var json = JsonUtility.ToJson(new OpusJson { type = "opus", length = length, data = encode });
+        // connect.Send(json);
+        OnData(json);
     }
 
     void OnData(string msg)
     {
         var json = JsonUtility.FromJson<OpusJson>(msg);
-        var data = Convert.FromBase64String(json.data);
-        speaker.ReceiveBytes(data, json.length);
+        var compress = Convert.FromBase64String(json.data);
+        MemoryStream mssrc = new MemoryStream(compress);
+        MemoryStream outstream = new MemoryStream();
+        byte[] buffer = new byte[1024];
+        DeflateStream uncompressStream = new DeflateStream(mssrc, CompressionMode.Decompress);
+        while (true)
+        {
+            int readSize = uncompressStream.Read(buffer, 0, buffer.Length);
+            if (readSize == 0) break;
+            outstream.Write(buffer, 0, readSize);
+        }
+        uncompressStream.Close();
+        mssrc.Close();
+        byte[] outByte = outstream.ToArray();
+
+        speaker.ReceiveBytes(outByte, json.length);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityOpus;
-
+using System.Threading;
 
 [RequireComponent(typeof(AudioSource))]
 public class Speaker : MonoBehaviour
@@ -16,9 +16,11 @@ public class Speaker : MonoBehaviour
 
     Decoder decoder;
     readonly float[] pcmBuffer = new float[Decoder.maximumPacketDuration * (int)channels];
+    SynchronizationContext context;
 
     void OnEnable()
     {
+        context = SynchronizationContext.Current;
         decoder = new Decoder(SamplingFrequency.Frequency_48000, NumChannels.Mono);
 
         source = GetComponent<AudioSource>();
@@ -35,6 +37,7 @@ public class Speaker : MonoBehaviour
 
     public void ReceiveBytes(byte[] encodedData, int length)
     {
+        Debug.Log("ReceiveBytes");
         if (decoder != null)
         {
             var pcmLength = decoder.Decode(encodedData, length, pcmBuffer);
@@ -45,14 +48,22 @@ public class Speaker : MonoBehaviour
                 audioClipData = new float[pcmLength];
             }
             Array.Copy(pcmBuffer, audioClipData, pcmLength);
-            source.clip.SetData(audioClipData, samplePos);
-            samplePos += pcmLength;
-            if (!source.isPlaying && samplePos > audioClipLength / 2)
-            {
-                source.Play();
-            }
-            samplePos %= audioClipLength;
+
+            // context.Post(_ => { Play(pcmLength); }, null);
+            Play(pcmLength);
         }
+    }
+
+    void Play(int pcmLength)
+    {
+        source.clip.SetData(audioClipData, samplePos);
+        samplePos += pcmLength;
+        if (!source.isPlaying && samplePos > audioClipLength / 2)
+        {
+            Debug.Log("source.Play");
+            source.Play();
+        }
+        samplePos %= audioClipLength;
     }
 
     public float GetAveragedVolume()
