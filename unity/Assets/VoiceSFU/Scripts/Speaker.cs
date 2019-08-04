@@ -37,22 +37,33 @@ public class Speaker : MonoBehaviour
 
     public void ReceiveBytes(byte[] encodedData, int length)
     {
-        Debug.Log("ReceiveBytes");
         if (decoder != null)
         {
-            var pcmLength = decoder.Decode(encodedData, length, pcmBuffer);
-
-            if (audioClipData == null || audioClipData.Length != pcmLength)
-            {
-                // assume that pcmLength will not change.
-                audioClipData = new float[pcmLength];
-            }
-            Array.Copy(pcmBuffer, audioClipData, pcmLength);
-
-            // context.Post(_ => { Play(pcmLength); }, null);
-            Play(pcmLength);
+            context.Post(_ => SetData(encodedData, length), null);
         }
     }
+
+    void SetData(byte[] encodedData, int length)
+    {
+        var pcmLength = decoder.Decode(encodedData, length, pcmBuffer);
+
+        if (audioClipData == null || audioClipData.Length != pcmLength)
+        {
+            // assume that pcmLength will not change.
+            audioClipData = new float[pcmLength];
+        }
+        Array.Copy(pcmBuffer, audioClipData, pcmLength);
+
+        source.clip.SetData(audioClipData, samplePos);
+        samplePos += pcmLength;
+        if (!source.isPlaying && samplePos > audioClipLength / 2)
+        {
+            Debug.Log("source.Play");
+            source.Play();
+        }
+        samplePos %= audioClipLength;
+    }
+
 
     void Play(int pcmLength)
     {
