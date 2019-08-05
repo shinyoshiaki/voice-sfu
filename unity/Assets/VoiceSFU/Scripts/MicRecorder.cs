@@ -2,22 +2,23 @@
 using System;
 using UnityEngine;
 using UnityOpus;
+using UniRx;
 
 public class MicRecorder : MonoBehaviour
 {
     public bool IsMute = false;
 
-    const int samplingFrequency = 48000;
+    const SamplingFrequency samplingFrequency = SamplingFrequency.Frequency_24000;
     const int lengthSeconds = 1;
 
-    const int bitrate = 96000;
-    const int frameSize = 120;
+    const int bitrate = (int)samplingFrequency * 2;
+    const int frameSize = 120 * 4;
     const int outputBufferSize = frameSize * 4; // at least frameSize * sizeof(float)
 
     AudioClip clip;
     int samplePos = 0;
     float[] processBuffer = new float[512];
-    float[] microphoneBuffer = new float[lengthSeconds * samplingFrequency];
+    float[] microphoneBuffer = new float[lengthSeconds * (int)samplingFrequency];
 
     Encoder encoder;
     Queue<float> pcmQueue = new Queue<float>();
@@ -40,7 +41,7 @@ public class MicRecorder : MonoBehaviour
     void OnEnable()
     {
         encoder = new Encoder(
-            SamplingFrequency.Frequency_48000,
+            samplingFrequency,
             NumChannels.Mono,
             OpusApplication.Audio)
         {
@@ -59,10 +60,14 @@ public class MicRecorder : MonoBehaviour
 
     void Start()
     {
-        clip = Microphone.Start(null, true, lengthSeconds, samplingFrequency);
+        clip = Microphone.Start(null, true, lengthSeconds, (int)samplingFrequency);
+        Observable.Interval(TimeSpan.FromMilliseconds(1000 / 10)).Subscribe(_ =>
+         {
+             Recorde();
+         }).AddTo(this);
     }
 
-    void Update()
+    void Recorde()
     {
         var position = Microphone.GetPosition(null);
         if (position < 0 || samplePos == position)

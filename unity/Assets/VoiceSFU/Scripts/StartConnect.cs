@@ -39,8 +39,8 @@ public class StartConnect : MonoBehaviour
     {
         var encode = Convert.ToBase64String(Compresse.DeflateEncode(data));
         var json = JsonUtility.ToJson(new OpusJson { type = "opus", length = length, data = encode });
-        connect.Send(json);
-        // OnData(json);
+        // connect.Send(json);
+        OnData(json);
     }
 
     void OnData(string msg)

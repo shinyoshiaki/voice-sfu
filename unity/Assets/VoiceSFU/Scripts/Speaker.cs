@@ -7,7 +7,7 @@ using System.Threading;
 public class Speaker : MonoBehaviour
 {
     const NumChannels channels = NumChannels.Mono;
-    const SamplingFrequency frequency = SamplingFrequency.Frequency_48000;
+    const SamplingFrequency frequency = SamplingFrequency.Frequency_24000;
 
     int audioClipLength = (int)frequency; // 1.0[sec]
     AudioSource source;
@@ -21,7 +21,7 @@ public class Speaker : MonoBehaviour
     void OnEnable()
     {
         context = SynchronizationContext.Current;
-        decoder = new Decoder(SamplingFrequency.Frequency_48000, NumChannels.Mono);
+        decoder = new Decoder(frequency, NumChannels.Mono);
 
         source = GetComponent<AudioSource>();
         source.clip = AudioClip.Create("AudioStreamPlayer", audioClipLength, (int)channels, (int)frequency, false);
