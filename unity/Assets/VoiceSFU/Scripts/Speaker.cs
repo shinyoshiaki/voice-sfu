@@ -64,19 +64,6 @@ public class Speaker : MonoBehaviour
         samplePos %= audioClipLength;
     }
 
-
-    void Play(int pcmLength)
-    {
-        source.clip.SetData(audioClipData, samplePos);
-        samplePos += pcmLength;
-        if (!source.isPlaying && samplePos > audioClipLength / 2)
-        {
-            Debug.Log("source.Play");
-            source.Play();
-        }
-        samplePos %= audioClipLength;
-    }
-
     public float GetAveragedVolume()
     {
         int size = 1024;

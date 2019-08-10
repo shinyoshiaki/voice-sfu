@@ -34,6 +34,13 @@ namespace WebRTC
 
         public Signaling(string room)
         {
+#if UNITY_EDITOR
+#elif UNITY_ANDROID
+        AndroidJavaClass playerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+        AndroidJavaObject activity = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
+        AndroidJavaClass utilityClass = new AndroidJavaClass("org.webrtc.UnityUtility");
+        utilityClass.CallStatic("InitializePeerConncectionFactory", new object[1] { activity });
+#endif
             roomId = room;
             InitPeer();
         }
@@ -77,7 +84,7 @@ namespace WebRTC
 
         public void Connected(int id)
         {
-            var data = new RoomJson { type = "connect", roomId = roomId };            
+            var data = new RoomJson { type = "connect", roomId = roomId };
             var json = JsonUtility.ToJson(data);
             OnConnectMethod(json);
         }

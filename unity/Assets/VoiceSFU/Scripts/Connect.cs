@@ -31,14 +31,6 @@ public class Connect : MonoBehaviour
     {
         var s = Scheduler.MainThread;
 
-#if UNITY_EDITOR
-#elif UNITY_ANDROID
-        AndroidJavaClass playerClass = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-        AndroidJavaObject activity = playerClass.GetStatic<AndroidJavaObject>("currentActivity");
-        AndroidJavaClass utilityClass = new AndroidJavaClass("org.webrtc.UnityUtility");
-        utilityClass.CallStatic("InitializePeerConncectionFactory", new object[1] { activity });
-#endif
-
         Debug.Log("start");
 
         signaling = new Signaling(ipAddress);
@@ -71,7 +63,7 @@ public class Connect : MonoBehaviour
 
     async void Join()
     {
-        var request = new UnityWebRequest("http://" + baseAddress + ":8080/join", "POST");
+        var request = new UnityWebRequest("http://" + baseAddress + "/join", "POST");
         var join = new JoinReq { room = "unity" };
         var json = JsonUtility.ToJson(join);
         byte[] postData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -89,7 +81,9 @@ public class Connect : MonoBehaviour
     void OnConnet(string str)
     {
         if (connected == true) return;
-        
+
+        Debug.Log("connected");
+
         connected = true;
         signaling.peer.AddDataChannel();
         OnConnectd();
@@ -119,7 +113,7 @@ public class Connect : MonoBehaviour
         Scheduler.MainThread.Schedule(() =>
         {
             Debug.Log("onsdp");
-            var request = new UnityWebRequest("http://" + baseAddress + ":8080/answer", "POST");
+            var request = new UnityWebRequest("http://" + baseAddress + "/answer", "POST");
             var join = new AnswerReq { room = "unity", uu = id, type = _type, sdp = _sdp };
             var json = JsonUtility.ToJson(join);
             byte[] postData = System.Text.Encoding.UTF8.GetBytes(json);

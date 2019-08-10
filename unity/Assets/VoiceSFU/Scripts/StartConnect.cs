@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UniRx;
-using System.IO;
-using System.IO.Compression;
 
 public class StartConnect : MonoBehaviour
 {
@@ -18,7 +18,7 @@ public class StartConnect : MonoBehaviour
         micRecorder = GetComponent<MicRecorder>();
         speaker = GetComponent<Speaker>();
 
-        connect.StartConnect("192.168.1.7");
+        connect.StartConnect("192.168.1.2:8088");
         connect.OnConnectd += OnConnect;
         connect.OnData += OnData;
     }
@@ -39,7 +39,7 @@ public class StartConnect : MonoBehaviour
     {
         var encode = Convert.ToBase64String(Compresse.DeflateEncode(data));
         var json = JsonUtility.ToJson(new OpusJson { type = "opus", length = length, data = encode });
-        // connect.Send(json);
+        connect.Send(json);
         OnData(json);
     }
 
